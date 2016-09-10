@@ -1,0 +1,28 @@
+.child {
+  width: 20rem;
+  height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.child-1 {
+  background: red;
+}
+
+.child-2 {
+  background: blue;
+}
+
+.child-3 {
+  background: green;
+}
+
+.child-4 {
+  background: purple;
+}
+
+.child-5 {
+  background: yellow;
+}
