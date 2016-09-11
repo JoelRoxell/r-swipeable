@@ -1,4 +1,3 @@
-
 import React, { Component, PropTypes } from 'react';
 import autoprefixer from 'react-prefixer';
 import styles from './style';
@@ -148,17 +147,17 @@ class Swipeable extends Component {
   /**
    * Position view by child index.
    */
-  positionViewByChildIndex(index) {
-    // Limit index bounds.
-    if (index < 0 ) {
-      index = 0;
-    } else if (index === this.childXCenterPosList.length) {
-      index = this.childXCenterPosList.length - 1;
+  positionViewByChildIndex(targetIndex) {
+    // Limit targetIndex bounds.
+    if (targetIndex < 0 ) {
+      targetIndex = 0;
+    } else if (targetIndex === this.childXCenterPosList.length) {
+      targetIndex = this.childXCenterPosList.length - 1;
     }
 
     this.setState({
-      contentPos: this.viewportCenter - this.childXCenterPosList[index].clientXCenter,
-      currentCenteredChildIndex: index
+      contentPos: this.viewportCenter - this.childXCenterPosList[targetIndex].clientXCenter,
+      currentCenteredChildIndex: targetIndex
     });
   }
 
@@ -350,7 +349,7 @@ class Swipeable extends Component {
 Swipeable.LEFT = 'LEFT';
 Swipeable.RIGHT = 'RIGHT';
 Swipeable.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element),
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
   className: PropTypes.string,
   flickSensitivity: PropTypes.number,
   slopeLimit: PropTypes.number
