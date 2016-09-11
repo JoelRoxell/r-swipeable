@@ -8,7 +8,6 @@ r-swipeable provides `Swipeable` which makes its subcomponents horizontally swip
 ## Usage
 
 ### Swipe and drag
-
 ```javascript
 import React, { Component, PropTypes } from 'react';
 import Swipeable from 'r-swipeable';
@@ -34,7 +33,6 @@ export default SwipeableComponent;
 ```
 
 #### Example
-
 ![example-gif](http://gropio.com/stek/file/d3gzts)
 
 ### Add button navigation
@@ -61,7 +59,7 @@ class SwipeableComponent extends Component {
   }
 
   onChange(index) {
-    // Update container state if swipeable is updated internally by a drag.
+    // Update container state if Swipeable is updated internally by a drag.
     this.setState({ currentIndex: index });
   }
 
