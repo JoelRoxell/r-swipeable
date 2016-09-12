@@ -69,7 +69,7 @@ class Swipeable extends Component {
       return;
     }
 
-    // Finally trigger `onChange` cb if it's defined.
+    // Trigger `onChange` cb if it's defined.
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(this.state.currentCenteredChildIndex);
     }
@@ -298,14 +298,14 @@ class Swipeable extends Component {
 
     let nextTarget = this.state.direction === Swipeable.LEFT ? ++currentChildIndex : --currentChildIndex;
 
-    if (nextTarget < 0) {
+    if (nextTarget < 0 ) {
       nextTarget = 0;
     } else if (nextTarget === this.childXCenterPosList.length) {
       nextTarget = this.childXCenterPosList.length - 1;
     }
 
-    // If velocity of a swipe is greater thatn the specified flick sensitivity
-    // and the drag ditance is lesser or equal to the first child with.
+    // If velocity of a swipe is greater than the specified flick sensitivity
+    // and the drag ditance is lesser or equal to the first child width.
     // A flick gesture has been initiated.
     if (
       this.getDragVelocity() > this.props.flickSensitivity &&
