@@ -30,7 +30,11 @@ class Swipeable extends Component {
     this.updateViewMetrics();
     requestAnimationFrame(this.animateDrag);
 
-    const contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
+    let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
+
+    if (!isNaN(this.props.currentIndex)) {
+      contentCenterChildIndex = this.props.currentIndex;
+    }
 
     this.setState({
       contentPos: this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter,
@@ -38,8 +42,27 @@ class Swipeable extends Component {
     });
   }
 
-  componentDidUpdate() {
+  componentWillReceiveProps(nProps) {
+    // Index state was changed in a component higher up.
+    if (this.props.currentIndex !== nProps.currentIndex) {
+      this.positionViewByChildIndex(nProps.currentIndex);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
     this.updateViewMetrics();
+
+    if (prevState.currentCenteredChildIndex === this.state.currentCenteredChildIndex) {
+      return;
+    }
+
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(this.state.currentCenteredChildIndex);
+    }
+  }
+
+  shouldComponentUpdate(nProp, nState) {
+    return true;
   }
 
   componentWillUnmount() {
@@ -264,13 +287,19 @@ class Swipeable extends Component {
       return;
     }
 
+    let nextTarget = this.state.direction === Swipeable.LEFT ? ++currentChildIndex : --currentChildIndex;
+
+    if (nextTarget < 0 ) {
+      nextTarget = 0;
+    } else if (nextTarget === this.childXCenterPosList.length) {
+      nextTarget = this.childXCenterPosList.length - 1;
+    }
+
     if (
       this.getDragVelocity() > this.props.flickSensitivity &&
       Math.abs(distance) <= this.content.childNodes[0].offsetWidth
     ) {
-      this.state.direction === Swipeable.LEFT ?
-        this.positionViewByChildIndex(++currentChildIndex):
-        this.positionViewByChildIndex(--currentChildIndex);
+        this.positionViewByChildIndex(nextTarget);
     } else {
       this.repositionToClosestChildCenter();
     }
