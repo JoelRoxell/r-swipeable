@@ -1,5 +1,4 @@
 # r-swipeable
-
 r-swipeable provides `Swipeable` which makes its subcomponents horizontally swipeable.
 
 * Repositions to nearest child center after a flick gesture.
@@ -33,6 +32,7 @@ export default SwipeableComponent;
 ```
 
 #### Example
+
 ![example-gif](http://gropio.com/stek/file/d3gzts)
 
 ### Add button navigation
@@ -91,8 +91,10 @@ export default SwipeableComponent;
 ## API
 
 ### `<Swipeable>`
+Wrapper component which makes its child elements swipeable.
 
 #### Props
+`children` (required) - Elements that will be wrapper (in row).
 
 `children` (required) - Elements that will be wrapper and made swipeable. (horizontally)
 
@@ -101,10 +103,9 @@ export default SwipeableComponent;
 `slopeLimit` - Indicates if a swipe should be considered x-drag or y-drag. It's only possible to swipe in on direction at the time.
 
 #### Methods
-
 `onChange(callback)`
 
-Called with the new `index` as a parameter, every time a new index is set.
+Called with the new `index` as a parameter, every time a new index is set.md
 
 ```javascript
 function cb(index) {
