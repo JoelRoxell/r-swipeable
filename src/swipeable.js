@@ -36,8 +36,10 @@ class Swipeable extends Component {
       contentCenterChildIndex = this.props.currentIndex;
     }
 
+    const contentPos = this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter;
+
     this.setState({
-      contentPos: this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter,
+      contentPos,
       currentCenteredChildIndex: contentCenterChildIndex
     });
   }
@@ -51,6 +53,15 @@ class Swipeable extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     this.updateViewMetrics();
+
+    const currentIndex = this.props.currentIndex,
+      childLimitLength = this.childXCenterPosList.length - 1;
+
+    if (currentIndex < 0) {
+      this.props.onChange(0);
+    } else if (currentIndex > childLimitLength) {
+      this.props.onChange(childLimitLength);
+    }
 
     if (prevState.currentCenteredChildIndex === this.state.currentCenteredChildIndex) {
       return;
@@ -188,7 +199,6 @@ class Swipeable extends Component {
     let newCordinates = {};
 
     if (e.type === 'touchstart') {
-
         newCordinates = {
           clientX: e.touches[0].clientX,
           oldClientX: e.touches[0].clientX,
