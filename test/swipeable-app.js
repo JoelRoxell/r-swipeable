@@ -35,13 +35,8 @@ class SwipeableComponent extends Component {
     }
   }
 
-  setSwipeNode(node) {
-    this.swiper = node;
-  }
-
   onChange(index) {
     // Container state if swiper is updated internally by a drag and keep indexes in sync.
-    console.log(index);
     this.setState({ currentIndex: index });
   }
 
