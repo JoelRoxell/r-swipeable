@@ -1,6 +1,5 @@
 # r-swipeable
 r-swipeable provides `Swipeable` which makes its subcomponents horizontally swipeable.
-
 * Repositions to nearest child center after a flick gesture.
 * Uses `requestAnimationFrame` to manage translations changes.
 
@@ -59,7 +58,7 @@ class SwipeableComponent extends Component {
   }
 
   onChange(index) {
-    // Update container state if Swipeable is updated internally by a drag.
+    // Update container state if swipeable is updated internally by a drag.
     this.setState({ currentIndex: index });
   }
 
@@ -105,7 +104,7 @@ Wrapper component which makes its child elements swipeable.
 #### Methods
 `onChange(callback)`
 
-Called with the new `index` as a parameter, every time a new index is set.md
+Called with the new `index` as a parameter, every time a new index is set.
 
 ```javascript
 function cb(index) {

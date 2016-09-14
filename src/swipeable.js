@@ -298,7 +298,7 @@ class Swipeable extends Component {
 
     let nextTarget = this.state.direction === Swipeable.LEFT ? ++currentChildIndex : --currentChildIndex;
 
-    if (nextTarget < 0 ) {
+    if (nextTarget < 0) {
       nextTarget = 0;
     } else if (nextTarget === this.childXCenterPosList.length) {
       nextTarget = this.childXCenterPosList.length - 1;
