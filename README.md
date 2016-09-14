@@ -1,9 +1,9 @@
 # r-swipeable
 
-A react component making its child elements swipeable.
+r-swipeable provides `Swipeable` which makes its subcomponents horizontally swipeable.
 
-- Snaps nearest child center to swipe-container center.
-- Child x-axis centers are currently based on the first child element.
+* Repositions to nearest child center after a flick gesture.
+* Uses `requestAnimationFrame` to manage translations changes.
 
 ## Usage
 
@@ -14,16 +14,14 @@ import React, { Component, PropTypes } from 'react';
 import Swipeable from 'r-swipeable';
 
 function renderTestItems() {
-  return [1, 2, 3, 4, 5].map(i => {
-    return (
-      <div
-        className={`child child-${i}`}
-        key={ i }
-      >
-        { i }
-      </div>
-    );
-  });
+  return [1, 2, 3, 4, 5].map(i => (
+    <div
+      className={`child child-${i}`}
+      key={ i }
+    >
+      { i }
+    </div>
+  ));
 }
 
 const SwipeableComponent = () => (
@@ -63,7 +61,7 @@ class SwipeableComponent extends Component {
   }
 
   onChange(index) {
-    // Container state if swiper is updated internally by a drag and keep indexes in sync.
+    // Update container state if swipeable is updated internally by a drag.
     this.setState({ currentIndex: index });
   }
 
@@ -78,11 +76,11 @@ class SwipeableComponent extends Component {
         </Swipeable>
 
         <div onClick={ this.forward }>
-          { `Go to forward` }
+          { `Go to forwards` }
         </div>
 
         <div onClick={ this.backward }>
-          { `Go to backward` }
+          { `Go to backwards` }
         </div>
       </div>
     );
@@ -96,23 +94,19 @@ export default SwipeableComponent;
 
 ### `<Swipeable>`
 
-Wrapper component which makes its child elements swipeable.
-
 #### Props
 
-`children` (required) - Elements that will be wrapper (in row).
+`children` (required) - Elements that will be wrapper and made swipeable. (horizontally)
 
-`flickSensitivity` - Limit which specifies when an actual flick gesture occurred.
+`flickSensitivity` - Specifies a limit which decides when an actual flick gesture should be triggered.
 
-`slopeLimit` - Number indicating if a swipe should be considered x-drag or y-drag. It's only possible to swipe in on direction at the time.
-
-`className` - String used to enhance or override style.
+`slopeLimit` - Indicates if a swipe should be considered x-drag or y-drag. It's only possible to swipe in on direction at the time.
 
 #### Methods
 
-`onChange(index)`
+`onChange(callback)`
 
-Last updated index.
+Called with the new `index` as a parameter, every time a new index is set.
 
 ```javascript
 function cb(index) {

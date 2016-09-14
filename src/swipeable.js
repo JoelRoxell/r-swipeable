@@ -32,6 +32,7 @@ class Swipeable extends Component {
 
     let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
 
+    // Center by props index or select the "most" centered child.
     if (!isNaN(this.props.currentIndex)) {
       contentCenterChildIndex = this.props.currentIndex;
     }
@@ -45,7 +46,7 @@ class Swipeable extends Component {
   }
 
   componentWillReceiveProps(nProps) {
-    // Index state was changed in a component higher up.
+    // Index state was changed by a component containing the `Swipeable`.
     if (this.props.currentIndex !== nProps.currentIndex) {
       this.positionViewByChildIndex(nProps.currentIndex);
     }
@@ -57,6 +58,7 @@ class Swipeable extends Component {
     const currentIndex = this.props.currentIndex,
       childLimitLength = this.childXCenterPosList.length - 1;
 
+    // Prevent external index management to step out of bounds.
     if (currentIndex < 0) {
       this.props.onChange(0);
     } else if (currentIndex > childLimitLength) {
@@ -67,13 +69,10 @@ class Swipeable extends Component {
       return;
     }
 
+    // Finally trigger `onChange` cb if it's defined.
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(this.state.currentCenteredChildIndex);
     }
-  }
-
-  shouldComponentUpdate(nProp, nState) {
-    return true;
   }
 
   componentWillUnmount() {
@@ -299,12 +298,15 @@ class Swipeable extends Component {
 
     let nextTarget = this.state.direction === Swipeable.LEFT ? ++currentChildIndex : --currentChildIndex;
 
-    if (nextTarget < 0 ) {
+    if (nextTarget < 0) {
       nextTarget = 0;
     } else if (nextTarget === this.childXCenterPosList.length) {
       nextTarget = this.childXCenterPosList.length - 1;
     }
 
+    // If velocity of a swipe is greater thatn the specified flick sensitivity
+    // and the drag ditance is lesser or equal to the first child with.
+    // A flick gesture has been initiated.
     if (
       this.getDragVelocity() > this.props.flickSensitivity &&
       Math.abs(distance) <= this.content.childNodes[0].offsetWidth
