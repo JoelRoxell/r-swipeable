@@ -1,4 +1,3 @@
-
 import React, { Component, PropTypes } from 'react';
 import autoprefixer from 'react-prefixer';
 import styles from './style';
@@ -31,16 +30,49 @@ class Swipeable extends Component {
     this.updateViewMetrics();
     requestAnimationFrame(this.animateDrag);
 
-    const contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
+    let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
+
+    // Center by props index or select the "most" centered child.
+    if (!isNaN(this.props.currentIndex)) {
+      contentCenterChildIndex = this.props.currentIndex;
+    }
+
+    const contentPos = this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter;
 
     this.setState({
-      contentPos: this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter,
+      contentPos,
       currentCenteredChildIndex: contentCenterChildIndex
     });
   }
 
-  componentDidUpdate() {
+  componentWillReceiveProps(nProps) {
+    // Index state was changed by a component containing the `Swipeable`.
+    if (this.props.currentIndex !== nProps.currentIndex) {
+      this.positionViewByChildIndex(nProps.currentIndex);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
     this.updateViewMetrics();
+
+    const currentIndex = this.props.currentIndex,
+      childLimitLength = this.childXCenterPosList.length - 1;
+
+    // Prevent external index management to step out of bounds.
+    if (currentIndex < 0) {
+      this.props.onChange(0);
+    } else if (currentIndex > childLimitLength) {
+      this.props.onChange(childLimitLength);
+    }
+
+    if (prevState.currentCenteredChildIndex === this.state.currentCenteredChildIndex) {
+      return;
+    }
+
+    // Finally trigger `onChange` cb if it's defined.
+    if (typeof this.props.onChange === 'function') {
+      this.props.onChange(this.state.currentCenteredChildIndex);
+    }
   }
 
   componentWillUnmount() {
@@ -148,17 +180,17 @@ class Swipeable extends Component {
   /**
    * Position view by child index.
    */
-  positionViewByChildIndex(index) {
-    // Limit index bounds.
-    if (index < 0 ) {
-      index = 0;
-    } else if (index === this.childXCenterPosList.length) {
-      index = this.childXCenterPosList.length - 1;
+  positionViewByChildIndex(targetIndex) {
+    // Limit targetIndex bounds.
+    if (targetIndex < 0 ) {
+      targetIndex = 0;
+    } else if (targetIndex === this.childXCenterPosList.length) {
+      targetIndex = this.childXCenterPosList.length - 1;
     }
 
     this.setState({
-      contentPos: this.viewportCenter - this.childXCenterPosList[index].clientXCenter,
-      currentCenteredChildIndex: index
+      contentPos: this.viewportCenter - this.childXCenterPosList[targetIndex].clientXCenter,
+      currentCenteredChildIndex: targetIndex
     });
   }
 
@@ -166,7 +198,6 @@ class Swipeable extends Component {
     let newCordinates = {};
 
     if (e.type === 'touchstart') {
-
         newCordinates = {
           clientX: e.touches[0].clientX,
           oldClientX: e.touches[0].clientX,
@@ -265,13 +296,22 @@ class Swipeable extends Component {
       return;
     }
 
+    let nextTarget = this.state.direction === Swipeable.LEFT ? ++currentChildIndex : --currentChildIndex;
+
+    if (nextTarget < 0) {
+      nextTarget = 0;
+    } else if (nextTarget === this.childXCenterPosList.length) {
+      nextTarget = this.childXCenterPosList.length - 1;
+    }
+
+    // If velocity of a swipe is greater thatn the specified flick sensitivity
+    // and the drag ditance is lesser or equal to the first child with.
+    // A flick gesture has been initiated.
     if (
       this.getDragVelocity() > this.props.flickSensitivity &&
       Math.abs(distance) <= this.content.childNodes[0].offsetWidth
     ) {
-      this.state.direction === Swipeable.LEFT ?
-        this.positionViewByChildIndex(++currentChildIndex):
-        this.positionViewByChildIndex(--currentChildIndex);
+        this.positionViewByChildIndex(nextTarget);
     } else {
       this.repositionToClosestChildCenter();
     }
@@ -350,7 +390,7 @@ class Swipeable extends Component {
 Swipeable.LEFT = 'LEFT';
 Swipeable.RIGHT = 'RIGHT';
 Swipeable.propTypes = {
-  children: PropTypes.arrayOf(PropTypes.element),
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
   className: PropTypes.string,
   flickSensitivity: PropTypes.number,
   slopeLimit: PropTypes.number
