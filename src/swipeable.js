@@ -80,6 +80,15 @@ class Swipeable extends Component {
   }
 
   /**
+   * Calculate total width of child nodes and return negated value as right limit
+   */
+  calculateRightLimit() {
+    const childNodes = this.content.children;
+    const totalWidth = childNodes[0].offsetWidth * childNodes.length;;
+    return -Math.abs(totalWidth);
+  }
+
+  /**
    * Update components properties to keep track of the DOM elements metrics used when swiping.
    */
   updateViewMetrics() {
