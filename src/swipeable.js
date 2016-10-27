@@ -93,17 +93,14 @@ class Swipeable extends Component {
    */
   updateViewMetrics() {
     this.leftLimit = 0;
+    this.rightLimit = this.calculateRightLimit();
     this.viewportWidth = this.viewport.offsetWidth;
     this.viewportCenter = this.viewportWidth / 2;
-    this.rightLimit = this.viewportWidth - this.content.offsetWidth;
 
-    // If last child is lesser than the viewport, allow it to be dragged a bit further.
-    if (this.content.childNodes[0].offsetWidth < this.viewportWidth) {
-      const slack = this.viewportWidth / 2;
+    const slack = this.viewportWidth / 2;
 
-      this.leftLimit = slack;
-      this.rightLimit = (this.viewportWidth - this.content.offsetWidth) - slack;
-    }
+    this.leftLimit = slack;
+    this.rightLimit = this.rightLimit + slack;
 
     this.determineChildrensMainAxisCenter();
   }
