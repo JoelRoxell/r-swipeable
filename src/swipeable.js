@@ -43,6 +43,9 @@ class Swipeable extends Component {
       contentPos,
       currentCenteredChildIndex: contentCenterChildIndex
     });
+
+    this.applyDisplayRuleToChildNodes();
+
   }
 
   componentWillReceiveProps(nProps) {
@@ -353,6 +356,12 @@ class Swipeable extends Component {
 
   setContentNode(node) {
     this.content = node;
+  }
+
+  applyDisplayRuleToChildNodes() {
+    for (let i = 0; i < this.content.childNodes.length; i++) {
+      this.content.childNodes[i].style.display = 'inline-block';
+    }
   }
 
   setStyle() {
