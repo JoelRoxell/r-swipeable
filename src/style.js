@@ -2,9 +2,10 @@ import autoprefixer from 'react-prefixer';
 
 export default autoprefixer({
   swipeable: {
-    display: 'flex',
-    width: '100%',
-    overflow: 'hidden'
+    height: 'auto',
+    width: 'auto',
+    overflow: 'hidden',
+    whiteSpace: 'nowrap'
   },
 
   animate: {
@@ -12,9 +13,6 @@ export default autoprefixer({
   },
 
   swipeableContent: {
-     willChange: 'transform, transition',
-     display: 'flex',
-     flexDirection: 'row',
-     flexShrink: '0'
+     willChange: 'transform, transition'
   }
 });
