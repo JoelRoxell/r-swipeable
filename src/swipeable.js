@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import autoprefixer from 'react-prefixer';
+import prefixAll from 'inline-style-prefixer/static';
 import styles from './style';
 
 class Swipeable extends Component {
@@ -332,11 +332,11 @@ class Swipeable extends Component {
       style = {
         transform: translateStr
       },
-      prefixStyles = autoprefixer(style);
+      prefixedStyles = prefixAll(style);
 
-    for (let prefix in prefixStyles) {
-      if (prefixStyles.hasOwnProperty(prefix)) {
-        this.content.style[prefix] = prefixStyles[prefix];
+    for (let prefix in prefixedStyles) {
+      if (prefixedStyles.hasOwnProperty(prefix)) {
+        this.content.style[prefix] = prefixedStyles[prefix];
       }
     }
 

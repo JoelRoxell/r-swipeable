@@ -1,6 +1,4 @@
-import autoprefixer from 'react-prefixer';
-
-export default autoprefixer({
+const styles = {
   swipeable: {
     height: 'auto',
     width: 'auto',
@@ -15,4 +13,6 @@ export default autoprefixer({
   swipeableContent: {
      willChange: 'transform, transition'
   }
-});
+};
+
+export default styles;
