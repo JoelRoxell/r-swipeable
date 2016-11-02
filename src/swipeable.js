@@ -45,7 +45,6 @@ class Swipeable extends Component {
     });
 
     this.applyDisplayRuleToChildNodes();
-
   }
 
   componentWillReceiveProps(nProps) {
@@ -87,8 +86,9 @@ class Swipeable extends Component {
    */
   calculateRightLimit() {
     const childNodes = this.content.children;
-    const totalWidth = childNodes[0].offsetWidth * childNodes.length;;
-    return -Math.abs(totalWidth);
+    const totalWidth = childNodes[0].offsetWidth * childNodes.length;
+
+    return -totalWidth;
   }
 
   /**
@@ -358,6 +358,11 @@ class Swipeable extends Component {
     this.content = node;
   }
 
+  /**
+   * This adds 'display: inline-block' to all childnodes to spare users the
+   * trouble of doing it manually and, also, prevent them from setting it to
+   * anything else
+   */
   applyDisplayRuleToChildNodes() {
     for (let i = 0; i < this.content.childNodes.length; i++) {
       this.content.childNodes[i].style.display = 'inline-block';
