@@ -5,7 +5,7 @@ function renderTestItems() {
   return [1, 2, 3, 4, 5].map(i => {
     return (
       <div
-        className={`child child-${i}`}
+        className={ 'child' }
         key={ i }
       >
         { i }

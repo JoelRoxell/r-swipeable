@@ -1,28 +1,24 @@
 .child {
-  width: 20rem;
-  height: 10rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+  width: 100%;
+  height: 100px;
 }
 
-.child-1 {
-  background: red;
+.child:nth-child(1) {
+  background-color: red;
 }
 
-.child-2 {
-  background: blue;
+.child:nth-child(2) {
+  background-color: blue;
 }
 
-.child-3 {
-  background: green;
+.child:nth-child(3) {
+  background-color: green;
 }
 
-.child-4 {
-  background: purple;
+.child:nth-child(4) {
+  background-color: purple;
 }
 
-.child-5 {
-  background: yellow;
+.child:nth-child(5) {
+  background-color: black;
 }
