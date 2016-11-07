@@ -1,6 +1,6 @@
 {
   "name": "r-swipeable",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Swipeable react wrapper for any number of child elements. (web)",
   "main": "lib/index.js",
   "scripts": {
