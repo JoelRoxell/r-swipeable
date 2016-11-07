@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import autoprefixer from 'react-prefixer';
+import prefixAll from 'inline-style-prefixer/static';
 import styles from './style';
 
 class Swipeable extends Component {
@@ -43,6 +43,8 @@ class Swipeable extends Component {
       contentPos,
       currentCenteredChildIndex: contentCenterChildIndex
     });
+
+    this.applyDisplayRuleToChildNodes();
   }
 
   componentWillReceiveProps(nProps) {
@@ -69,7 +71,7 @@ class Swipeable extends Component {
       return;
     }
 
-    // Finally trigger `onChange` cb if it's defined.
+    // Trigger `onChange` cb if it's defined.
     if (typeof this.props.onChange === 'function') {
       this.props.onChange(this.state.currentCenteredChildIndex);
     }
@@ -80,21 +82,28 @@ class Swipeable extends Component {
   }
 
   /**
+   * Calculate total width of child nodes and return negated value as right limit
+   */
+  calculateRightLimit() {
+    const childNodes = this.content.children;
+    const totalWidth = childNodes[0].offsetWidth * childNodes.length;
+
+    return -totalWidth;
+  }
+
+  /**
    * Update components properties to keep track of the DOM elements metrics used when swiping.
    */
   updateViewMetrics() {
     this.leftLimit = 0;
+    this.rightLimit = this.calculateRightLimit();
     this.viewportWidth = this.viewport.offsetWidth;
     this.viewportCenter = this.viewportWidth / 2;
-    this.rightLimit = this.viewportWidth - this.content.offsetWidth;
 
-    // If last child is lesser than the viewport, allow it to be dragged a bit further.
-    if (this.content.childNodes[0].offsetWidth < this.viewportWidth) {
-      const slack = this.viewportWidth / 2;
+    const slack = this.viewportWidth / 2;
 
-      this.leftLimit = slack;
-      this.rightLimit = (this.viewportWidth - this.content.offsetWidth) - slack;
-    }
+    this.leftLimit = slack;
+    this.rightLimit = this.rightLimit + slack;
 
     this.determineChildrensMainAxisCenter();
   }
@@ -304,8 +313,8 @@ class Swipeable extends Component {
       nextTarget = this.childXCenterPosList.length - 1;
     }
 
-    // If velocity of a swipe is greater thatn the specified flick sensitivity
-    // and the drag ditance is lesser or equal to the first child with.
+    // If velocity of a swipe is greater than the specified flick sensitivity
+    // and the drag ditance is lesser or equal to the first child width.
     // A flick gesture has been initiated.
     if (
       this.getDragVelocity() > this.props.flickSensitivity &&
@@ -326,11 +335,11 @@ class Swipeable extends Component {
       style = {
         transform: translateStr
       },
-      prefixStyles = autoprefixer(style);
+      prefixedStyles = prefixAll(style);
 
-    for (let prefix in prefixStyles) {
-      if (prefixStyles.hasOwnProperty(prefix)) {
-        this.content.style[prefix] = prefixStyles[prefix];
+    for (let prefix in prefixedStyles) {
+      if (prefixedStyles.hasOwnProperty(prefix)) {
+        this.content.style[prefix] = prefixedStyles[prefix];
       }
     }
 
@@ -347,6 +356,17 @@ class Swipeable extends Component {
 
   setContentNode(node) {
     this.content = node;
+  }
+
+  /**
+   * This adds 'display: inline-block' to all childnodes to spare users the
+   * trouble of doing it manually and, also, prevent them from setting it to
+   * anything else
+   */
+  applyDisplayRuleToChildNodes() {
+    for (let i = 0; i < this.content.childNodes.length; i++) {
+      this.content.childNodes[i].style.display = 'inline-block';
+    }
   }
 
   setStyle() {
