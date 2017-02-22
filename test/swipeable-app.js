@@ -46,6 +46,8 @@ class SwipeableComponent extends Component {
         <Swipeable
           onChange={ this.onChange }
           currentIndex={ this.state.currentIndex }
+          stiffness={ 300 }
+          damping={ 10 }
         >
           { renderTestItems() }
         </Swipeable>

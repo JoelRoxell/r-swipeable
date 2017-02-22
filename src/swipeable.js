@@ -349,9 +349,10 @@ class Swipeable extends Component {
     }
   }
 
-  setStyle(position) {
+  setStyle({ pos }) {
     let style = styles.swipeableContent;
-    const translateStr = `translate3d(${position.x}px, 0, 0)`;
+
+    const translateStr = `translate3d(${pos}px, 0, 0)`;
 
     return {
       ...style,
@@ -360,6 +361,10 @@ class Swipeable extends Component {
   }
 
   render() {
+    const { siffness, damping } = this.props;
+    const { dragging, contentPos } = this.state;
+    let style;
+
     return (
       <div
         style={ styles.swipeable }
@@ -373,21 +378,38 @@ class Swipeable extends Component {
         onTouchEnd={ this.onUp }
         onTouchCancel={ this.onLeave }
       >
-        <Motion
-          defaultStyle={ {x: 0} }
-          style={ {x: spring(this.state.contentPos, {
-            stiffness: 300, damping: 20
-          })} }
-        >
-          { interpolatingStyle => (
-            <div
-              style={ this.setStyle(interpolatingStyle) }
-              ref={ this.setContentNode }
-            >
-              { this.props.children }
-            </div>
-          ) }
-        </Motion>
+      { (() => {
+        if (dragging) {
+          style = {
+            translateX: contentPos
+          }
+        } else {
+          style = {
+            translateX: spring(contentPos, {
+              siffness,
+              damping
+            })
+          }
+        }
+
+        return (
+          <Motion
+            defaultStyle={ {translateX: 0} }
+            style={ style }
+          >
+            { ({ translateX }) => (
+              <div
+                style={ {
+                  transform: `translate3d(${translateX}px, 0px, 0)`
+                } }
+                ref={ this.setContentNode }
+              >
+                { this.props.children }
+              </div>
+            ) }
+          </Motion>
+        );
+      })() }
       </div>
     );
   }
@@ -403,7 +425,9 @@ Swipeable.propTypes = {
 };
 Swipeable.defaultProps = {
   flickSensitivity: 0.3,
-  slopeLimit: 45
+  slopeLimit: 45,
+  stiffness: 120,
+  damping: 14
 };
 
 export default Swipeable;
