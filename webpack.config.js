@@ -1,4 +1,5 @@
 var webpack = require('webpack');
+var path = require('path');
 
 const webpackConfig = {
   module: {},
@@ -12,8 +13,9 @@ webpackConfig.entry =  {
 },
 
 webpackConfig.output = {
-  path: './assets',
-  filename: '[name].js'
+  filename: '[name].js',
+  path: path.resolve(__dirname, "build"),
+  publicPath: '/assets/',
 },
 
 webpackConfig.module.loaders = [{
@@ -27,8 +29,7 @@ webpackConfig.module.loaders = [{
 
 webpackConfig.devServer = {
   historyApiFallback: true,
-  contentBase: './assets',
-  port: 8001,
+  contentBase: './assets/',
   stats: {
     chunks: false,
     chunkModules: false,

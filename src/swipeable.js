@@ -1,4 +1,6 @@
 import React, { Component, PropTypes } from 'react';
+import { Motion, spring, presets } from 'react-motion';
+
 import prefixAll from 'inline-style-prefixer/static';
 import styles from './style';
 
@@ -9,10 +11,10 @@ class Swipeable extends Component {
     this.state = {
       contentPos: 0,
       dragging: false,
-      clientX: 0,
-      oldClientX: 0,
-      clientStartX: 0,
-      clientEndX: 0,
+      clientX: 0, // new cooridnate
+      oldClientX: 0, // pre coordinate
+      clientStartX: 0, // start drag
+      clientEndX: 0, // end drag
       direction: null,
       timeFromStart: 0
     };
@@ -23,12 +25,10 @@ class Swipeable extends Component {
     this.onMove = this.onMove.bind(this);
     this.setViewportNode = this.setViewportNode.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
-    this.animateDrag = this.animateDrag.bind(this);
   }
 
   componentDidMount() {
     this.updateViewMetrics();
-    requestAnimationFrame(this.animateDrag);
 
     let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
 
@@ -262,7 +262,7 @@ class Swipeable extends Component {
       clientX = e.clientX;
     }
 
-    e.preventDefault();
+    // e.preventDefault();
 
     const distance = clientX - this.state.oldClientX,
       direction = distance > 0 ? Swipeable.RIGHT : Swipeable.LEFT;
@@ -330,26 +330,6 @@ class Swipeable extends Component {
     this.setState({ dragging: false }, this.repositionToClosestChildCenter());
   }
 
-  animateDrag() {
-    const translateStr = `translate3d(${this.state.contentPos}px, 0, 0)`,
-      style = {
-        transform: translateStr
-      },
-      prefixedStyles = prefixAll(style);
-
-    for (let prefix in prefixedStyles) {
-      if (prefixedStyles.hasOwnProperty(prefix)) {
-        this.content.style[prefix] = prefixedStyles[prefix];
-      }
-    }
-
-    let rafId = requestAnimationFrame(this.animateDrag);
-
-    if (this.cancelAnimationFrame) {
-      cancelAnimationFrame(rafId);
-    }
-  }
-
   setViewportNode(node) {
     this.viewport = node;
   }
@@ -369,17 +349,14 @@ class Swipeable extends Component {
     }
   }
 
-  setStyle() {
+  setStyle(position) {
     let style = styles.swipeableContent;
+    const translateStr = `translate3d(${position.x}px, 0, 0)`;
 
-    if (!this.state.dragging) {
-      style = {
-        ...style,
-        ...styles.animate
-      }
-    }
-
-    return style;
+    return {
+      ...style,
+      transform: translateStr
+    };
   }
 
   render() {
@@ -396,12 +373,21 @@ class Swipeable extends Component {
         onTouchEnd={ this.onUp }
         onTouchCancel={ this.onLeave }
       >
-        <div
-          style={ this.setStyle() }
-          ref={ this.setContentNode }
+        <Motion
+          defaultStyle={ {x: 0} }
+          style={ {x: spring(this.state.contentPos, {
+            stiffness: 300, damping: 20
+          })} }
         >
-          { this.props.children }
-        </div>
+          { interpolatingStyle => (
+            <div
+              style={ this.setStyle(interpolatingStyle) }
+              ref={ this.setContentNode }
+            >
+              { this.props.children }
+            </div>
+          ) }
+        </Motion>
       </div>
     );
   }
