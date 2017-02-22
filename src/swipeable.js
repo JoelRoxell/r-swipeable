@@ -262,7 +262,7 @@ class Swipeable extends Component {
       clientX = e.clientX;
     }
 
-    // e.preventDefault();
+    e.preventDefault();
 
     const distance = clientX - this.state.oldClientX,
       direction = distance > 0 ? Swipeable.RIGHT : Swipeable.LEFT;
