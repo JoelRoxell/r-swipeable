@@ -11,12 +11,21 @@ class Swipeable extends Component {
     this.state = {
       contentPos: 0,
       dragging: false,
-      clientX: 0, // new cooridnate
-      oldClientX: 0, // pre coordinate
-      clientStartX: 0, // start drag
-      clientEndX: 0, // end drag
+      timeFromStart: 0,
       direction: null,
-      timeFromStart: 0
+      clientX: 0,
+      oldClientX: 0,
+      clientStartX: 0,
+      clientEndX: 0,
+      clientY: 0,
+      oldClientY: 0,
+      leftLimit: 0,
+      rightLimit: 0,
+      viewportWidth: 0,
+      viewportCenter: 0,
+      totalWidth: 0,
+      slack: 0,
+      currentCenteredChildIndex: 0
     };
 
     this.onDown = this.onDown.bind(this);
@@ -25,26 +34,27 @@ class Swipeable extends Component {
     this.onMove = this.onMove.bind(this);
     this.setViewportNode = this.setViewportNode.bind(this);
     this.setContentNode = this.setContentNode.bind(this);
+    this.determineChildrensMainAxisCenter = this.determineChildrensMainAxisCenter.bind(this);
   }
 
   componentDidMount() {
-    this.updateViewMetrics();
+    this.updateViewMetrics().then(() => {
+      let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
 
-    let contentCenterChildIndex = Math.floor(this.childXCenterPosList.length / 2);
+      // Center by props index or select the "most" centered child.
+      if (!isNaN(this.props.currentIndex)) {
+        contentCenterChildIndex = this.props.currentIndex;
+      }
 
-    // Center by props index or select the "most" centered child.
-    if (!isNaN(this.props.currentIndex)) {
-      contentCenterChildIndex = this.props.currentIndex;
-    }
+      const contentPos = this.state.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter;
 
-    const contentPos = this.viewportCenter - this.childXCenterPosList[contentCenterChildIndex].clientXCenter;
+      this.setState({
+        contentPos,
+        currentCenteredChildIndex: contentCenterChildIndex
+      });
 
-    this.setState({
-      contentPos,
-      currentCenteredChildIndex: contentCenterChildIndex
+      this.applyDisplayRuleToChildNodes();
     });
-
-    this.applyDisplayRuleToChildNodes();
   }
 
   componentWillReceiveProps(nProps) {
@@ -55,7 +65,9 @@ class Swipeable extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.updateViewMetrics();
+    if (!this.childXCenterPosList) {
+      return;
+    }
 
     const currentIndex = this.props.currentIndex,
       childLimitLength = this.childXCenterPosList.length - 1;
@@ -77,37 +89,6 @@ class Swipeable extends Component {
     }
   }
 
-  componentWillUnmount() {
-    this.cancelAnimationFrame = true;
-  }
-
-  /**
-   * Calculate total width of child nodes and return negated value as right limit
-   */
-  calculateRightLimit() {
-    const childNodes = this.content.children;
-    const totalWidth = childNodes[0].offsetWidth * childNodes.length;
-
-    return -totalWidth;
-  }
-
-  /**
-   * Update components properties to keep track of the DOM elements metrics used when swiping.
-   */
-  updateViewMetrics() {
-    this.leftLimit = 0;
-    this.rightLimit = this.calculateRightLimit();
-    this.viewportWidth = this.viewport.offsetWidth;
-    this.viewportCenter = this.viewportWidth / 2;
-
-    const slack = this.viewportWidth / 2;
-
-    this.leftLimit = slack;
-    this.rightLimit = this.rightLimit + slack;
-
-    this.determineChildrensMainAxisCenter();
-  }
-
   /**
    * Calculate the center position for `content` children.
    */
@@ -120,18 +101,16 @@ class Swipeable extends Component {
 
     let childXCenterPosList = [];
 
-    this.childLength = this.content.offsetWidth / childCount;
+    const childCenter = this.state.childWidth / 2;
 
     // Determine center x cordinate of each child.
     for (let i = 0, childStartXCoordinate = 0; i < childCount; i++) {
-      let clientXCenter,
-        childCenter,
-        currentChild;
+      let clientXCenter;
+      let currentChild;
 
       currentChild = this.content.childNodes[i];
-      childCenter = currentChild.offsetWidth / 2;
       clientXCenter = childStartXCoordinate + childCenter;
-      childStartXCoordinate += currentChild.offsetWidth;
+      childStartXCoordinate += this.state.childWidth;
 
       childXCenterPosList.push({
         node: currentChild,
@@ -143,14 +122,34 @@ class Swipeable extends Component {
   }
 
   /**
-   * Position nearest `content` child in `viewport` center.
+   * Update components properties to keep track of the DOM elements metrics used when swiping.
    */
-  repositionToClosestChildCenter() {
-    const nearestChild = this.getClosestViewportChild();
+  updateViewMetrics() {
+    return new Promise((resolve, reject) => {
+      requestAnimationFrame(() => {
+        const childWidth = this.content.children[0].offsetWidth;
+        const contentWidth = this.content.childWidth;
+        const viewportWidth = this.viewport.offsetWidth;
+        const viewportCenter = viewportWidth / 2;
+        const slack = viewportWidth / 2;
+        const leftLimit = slack;
+        const totalWidth = - (childWidth * this.content.children.length);
+        const rightLimit = totalWidth + slack;
 
-    this.setState({
-      contentPos: this.viewportCenter - nearestChild.clientXCenter,
-      currentCenteredChildIndex: this.childXCenterPosList.indexOf(nearestChild)
+        this.setState({
+          childWidth,
+          viewportWidth,
+          viewportCenter,
+          leftLimit,
+          rightLimit,
+          totalWidth,
+          slack,
+          contentWidth
+        }, () => {
+          this.determineChildrensMainAxisCenter()
+          resolve();
+        });
+      });
     });
   }
 
@@ -161,7 +160,7 @@ class Swipeable extends Component {
    */
   getClosestViewportChild() {
     // Get content center cordinate relative to viewport.
-    const realativeContentCenterPos = this.viewportCenter - this.state.contentPos;
+    const realativeContentCenterPos = this.state.viewportCenter - this.state.contentPos;
 
     const findClosestChild = function(preChild, curChild) {
       const prePos = preChild.clientXCenter,
@@ -172,6 +171,18 @@ class Swipeable extends Component {
     };
 
     return this.childXCenterPosList.reduce(findClosestChild);
+  }
+
+  /**
+   * Position nearest `content` child in `viewport` center.
+   */
+  repositionToClosestChildCenter() {
+    const nearestChild = this.getClosestViewportChild();
+    console.log('closest', this.state.viewportCenter - nearestChild.clientXCenter);
+    this.setState({
+      contentPos: this.state.viewportCenter - nearestChild.clientXCenter,
+      currentCenteredChildIndex: this.childXCenterPosList.indexOf(nearestChild)
+    });
   }
 
   /**
@@ -198,7 +209,7 @@ class Swipeable extends Component {
     }
 
     this.setState({
-      contentPos: this.viewportCenter - this.childXCenterPosList[targetIndex].clientXCenter,
+      contentPos: this.state.viewportCenter - this.childXCenterPosList[targetIndex].clientXCenter,
       currentCenteredChildIndex: targetIndex
     });
   }
@@ -400,6 +411,7 @@ class Swipeable extends Component {
             { ({ translateX }) => (
               <div
                 style={ {
+                  display: 'flex',
                   transform: `translate3d(${translateX}px, 0px, 0)`
                 } }
                 ref={ this.setContentNode }
