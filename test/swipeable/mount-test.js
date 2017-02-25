@@ -1,7 +1,7 @@
 import { renderComponent , expect } from '../test-helper';
 import App from '../../src/swipeable';
 
-describe('App' , () => {
+describe('App', () => {
   let component;
 
   beforeEach(() => {

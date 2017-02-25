@@ -1,0 +1,13 @@
+[ignore]
+.*/lib
+.*/node_modules/.*
+
+[include]
+
+[libs]
+flow-typed/
+
+[options]
+munge_underscores=true
+suppress_type=$FlowFixMe
+suppress_comment= \\(.\\|\n\\)*\\$FlowFixMe
