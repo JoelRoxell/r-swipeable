@@ -1,5 +1,5 @@
 // @flow
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { Motion, spring } from 'react-motion';
 
 import styles from './style';
@@ -10,7 +10,8 @@ type Props = {
   flickSensitivity: ?number,
   slopeLimit: ?number,
   siffness: ?number,
-  damping: ?number
+  damping: ?number,
+  children: [React$Element<any>]
 };
 
 type State = {
@@ -434,7 +435,7 @@ class Swipeable extends Component {
                 siffness,
                 damping
               })
-            }
+            };
           }
 
           return (
