@@ -1,0 +1,47 @@
+{
+  "env": {
+    "es6": true,
+    "mocha": true
+  },
+  "extends" : [
+    "standard",
+    "standard-react",
+    "google"
+  ],
+  "globals": {
+    "React$Element": true,
+    "requestAnimationFrame": true,
+    "SyntheticEvent": true
+  },
+  "parser"  : "babel-eslint",
+  "plugins" : [
+    "react"
+  ],
+  "rules": {
+    "semi" : [2, "always"],
+    "max-len": [2, 120, 2],
+    "quotes": [2, "single", {
+      "allowTemplateLiterals": true,
+      "avoidEscape": true
+    }],
+    "jsx-quotes": [2, "prefer-single"],
+    "object-curly-spacing": ["error", "always", {
+      "objectsInObjects": false,
+      "arraysInObjects": false
+    }],
+    "react/jsx-curly-spacing": [2, "always"],
+    "react/jsx-no-literals": 1,
+    "no-unused-expressions": 0,
+    "comma-dangle": ["error", "never"],
+    "arrow-parens": ["error", "as-needed"],
+    "require-jsdoc": ["error", {
+        "require": {
+            "FunctionDeclaration": false,
+            "MethodDefinition": false,
+            "ClassDeclaration": false
+        }
+    }],
+    "operator-linebreak": ["error", "after"],
+    "newline-after-var": ["error", "always"]
+  },
+}

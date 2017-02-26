@@ -1,30 +1,26 @@
-var webpack = require('webpack');
-var path = require('path');
+const path = require('path');
 
 const webpackConfig = {
   module: {},
   devtool: 'source-map',
   modulesDirectories: ['node_modules', 'src'],
   target: 'web'
-}
+};
 
-webpackConfig.entry =  {
+webpackConfig.entry = {
   'swipeable-app': './test/index'
-},
+};
 
 webpackConfig.output = {
   filename: '[name].js',
-  path: path.resolve(__dirname, "build"),
-  publicPath: '/assets/',
-},
+  path: path.resolve(__dirname, 'build'),
+  publicPath: '/assets/'
+};
 
 webpackConfig.module.loaders = [{
   test: /\.(js)$/,
   exclude: /node_modules/,
-  loader: 'babel-loader',
-  query: {
-    presets: ['es2015', 'stage-0', 'react']
-  }
+  loader: 'babel-loader'
 }];
 
 webpackConfig.devServer = {
@@ -36,8 +32,8 @@ webpackConfig.devServer = {
     colors: true,
     quiet: false,
     noInfo: false,
-    lazy: false,
+    lazy: false
   }
-}
+};
 
 module.exports = webpackConfig;
