@@ -54,6 +54,7 @@ class Swipeable extends Component {
   setViewportNode: () => void;
   setContentNode: () => void;
   determineChildrensMainAxisCenter: () => void;
+  setCarouselLayout: () => void;
 
   constructor(props: Props) {
     super(props);
@@ -80,10 +81,6 @@ class Swipeable extends Component {
       contentWidth: 0
     };
 
-    window.addEventListener('resize', function carouselResize() {
-      this.setCarouselLayout();
-    }.bind(this));
-
     this.onDown = this.onDown.bind(this);
     this.onUp = this.onUp.bind(this);
     this.onLeave = this.onLeave.bind(this);
@@ -96,6 +93,10 @@ class Swipeable extends Component {
 
   componentDidMount() {
     this.setCarouselLayout();
+
+    window.addEventListener('resize', function carouselResize() {
+      this.setCarouselLayout();
+    }.bind(this));
   }
 
   componentWillReceiveProps(nProps: Props) {
